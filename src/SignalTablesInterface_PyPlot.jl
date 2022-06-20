@@ -20,7 +20,7 @@ module SignalTablesInterface_PyPlot
 
 
 # It seems that rcParams settings has only an effect, when set on PyPlot in Main
-import SignalTables
+using  SignalTables
 import Measurements
 import MonteCarloMeasurements
 
@@ -132,19 +132,19 @@ end
 
 
 """
-    addPlot(names, result, grid, xLabel, xAxis, prefix, reuse, maxLegend, MonteCarloAsArea, figure, i, j, nsubFigures)
+    addPlot(names, sigTable, grid, xLabel, xAxis, prefix, reuse, maxLegend, MonteCarloAsArea, figure, i, j, nsubFigures)
 
 Add the time series of one name (if names is one symbol/string) or with
 several names (if names is a tuple of symbols/strings) to the current diagram
 """
-function addPlot(collectionOfNames::Tuple, result, grid::Bool, xLabel::Bool, xAxis, prefix::AbstractString, reuse::Bool, maxLegend::Integer, 
+function addPlot(collectionOfNames::Tuple, sigTable, grid::Bool, xLabel::Bool, xAxis, prefix::AbstractString, reuse::Bool, maxLegend::Integer, 
                  MonteCarloAsArea::Bool, figure::Int, i::Int, j::Int, nsubFigures::Int)
     xsigLegend = ""
     nLegend = 0
 
     for name in collectionOfNames
         name2 = string(name)
-        (xsig, xsigLegend, ysig, ysigLegend, ysigType) = SignalTables.getPlotSignal(result, name2; xsigName = xAxis)
+        (xsig, xsigLegend, ysig, ysigLegend, ysigType) = SignalTables.getPlotSignal(sigTable, name2; xsigName = xAxis)
         if !isnothing(xsig)
             nLegend = nLegend + length(ysigLegend)
             if ndims(ysig) == 1
@@ -177,7 +177,7 @@ addPlot(name::Symbol        , args...) = addPlot((string(name),), args...)
 
 
 #--------------------------- Plot function
-function plot(result, names::AbstractMatrix; heading::AbstractString="", grid::Bool=true, xAxis=nothing,
+function plot(sigTable, names::AbstractMatrix; heading::AbstractString="", grid::Bool=true, xAxis=nothing,
               figure::Int=1, prefix::AbstractString="", reuse::Bool=false, maxLegend::Integer=10,
               minXaxisTickLabels::Bool=false, MonteCarloAsArea=false)
 
@@ -192,8 +192,8 @@ function plot(result, names::AbstractMatrix; heading::AbstractString="", grid::B
     PyPlot.pygui(true) # Use separate plot windows (no inline plots)
 
                                      
-    if isnothing(result)
-        @info "The call of ModiaPlot.plot(result, ...) is ignored, since the first argument is nothing."
+    if isnothing(sigTable)
+        @info "The call of SignalTables.plot(sigTable, ...) is ignored, since the first argument is nothing."
         return
     end
     xAxis2 = isnothing(xAxis) ? xAxis : string(xAxis)
@@ -201,7 +201,7 @@ function plot(result, names::AbstractMatrix; heading::AbstractString="", grid::B
     if !reuse
        PyPlot.clf()
     end
-    heading2 = SignalTables.getHeading(result, heading)
+    heading2 = getHeading(sigTable, heading)
     (nrow, ncol) = size(names)
 
     # Add signals
@@ -222,7 +222,7 @@ function plot(result, names::AbstractMatrix; heading::AbstractString="", grid::B
                 # Remove xaxis tick labels, if not the last row
                 ax.set_xticklabels([])
             end
-            addPlot(names[i,j], result, grid, xLabel, xAxis2, prefix, reuse, maxLegend, MonteCarloAsArea, figure, i, j, nrow*ncol)
+            addPlot(names[i,j], sigTable, grid, xLabel, xAxis2, prefix, reuse, maxLegend, MonteCarloAsArea, figure, i, j, nrow*ncol)
             k = k + 1
             if ncol == 1 && i == 1 && heading2 != "" && !reuse
                 PyPlot.title(heading2)
