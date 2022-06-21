@@ -39,7 +39,7 @@ set_matplotlib_rcParams!(args...) =
    merge!(PyCall.PyDict(PyPlot.matplotlib."rcParams"), Dict(args...))
 
 
-include("$(SignalTables.path)/src/AbstractLinePlotInterface.jl")
+include("$(SignalTables.path)/src/AbstractPlotInterface.jl")
 
 
 function plotOneSignal(xsig, ysig, ysigType, label, MonteCarloAsArea)
