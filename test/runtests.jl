@@ -1,12 +1,12 @@
 module Runtests
 
 import SignalTables
-using  Test
+using  SignalTables.Test
 
-@testset "Test ModiaPlot_PyPlot/test" begin
-    usePlotPackage("PyPlot")
-    include("$(SignalTables.path)/test/runtests_withPlot.jl")
-    usePreviousPlotPackage()
+@testset "Test SignalTablesInterface_PyPlot/test" begin
+    SignalTables.usePlotPackage("PyPlot")
+    include("$(SignalTables.path)/test/include_all.jl")
+    SignalTables.usePreviousPlotPackage()
 end
 
 end

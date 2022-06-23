@@ -1,38 +1,15 @@
 # SignalTablesInterface_PyPlot
 
-SignalTablesInterface_PyPlot is part of [ModiaSim](https://modiasim.github.io/docs/)
-and provides convenient line plots of simulation results with package
+[SignalTablesInterface_PyPlot](https://github.com/ModiaSim/SignalTablesInterface_PyPlot.jl) 
+is an interface from [SignalTables](https://github.com/ModiaSim/SignalTables.jl) to 
 [PyPlot](https://github.com/JuliaPy/PyPlot.jl) (= a
-Julia interface to the [Matplotlib](http://matplotlib.org/) plotting library 
-from Python, and specifically to the `matplotlib.pyplot` module).
+Julia interface to the [Matplotlib](http://matplotlib.org/)
+in order to be able to perform convenient line plots in SignalTables via PyPlot.
 
-SignalTablesInterface_PyPlot is typically not directly used, but is activated via package
+SignalTablesInterface_PyPlot is usually not directly used, but is activated via package
 [SignalTables](https://github.com/ModiaSim/SignalTables.jl).
 For details of the installation and the usage, 
 see the [SignalTables documentation](https://modiasim.github.io/SignalTables.jl/stable/index.html).
-
-
-## Example
-
-Once a signal table `sigTable` with signals `sigA(t), sigB(t), sigC(t), r[3](t)`:
-is available and `PyPlot` selected for plotting, 
-
-```julia
-using SignalTables
-
-usePlotPackage("PyPlot")                
-@usingModiaPlot   # = using SignalTablesInterface_PyPlot
-```
-
-then the following command
-
-```julia
-plot(result, [("sigA", "sigB", "sigC"), "r[2:3]"])
-```
-
-generates the following image (layout and legends are automatically constructed):
-
-![SegmentedSignalsPlot](docs/resources/images/signals-plot.png)
 
 
 ## Main developer
