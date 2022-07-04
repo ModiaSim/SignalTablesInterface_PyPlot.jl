@@ -2,14 +2,14 @@ module SignalTablesInterface_PyPlot
 
 # License for this file: MIT (expat)
 # Copyright 2017-2022, DLR Institute of System Dynamics and Control
-                           
+
 # ToDo:
-# MatplotlibDeprecationWarning: Adding an axes using the same arguments as a previous axes currently 
-# reuses the earlier instance.  In a future version, a new instance will always be created and returned.  
+# MatplotlibDeprecationWarning: Adding an axes using the same arguments as a previous axes currently
+# reuses the earlier instance.  In a future version, a new instance will always be created and returned.
 # Meanwhile, this warning can be suppressed, and the future behavior ensured, by passing a unique label to each axes instance.
 #
 # Description how to get rid of the warning:
-# https://stackoverflow.com/questions/46933824/matplotlib-adding-an-axes-using-the-same-arguments-as-a-previous-axes#  
+# https://stackoverflow.com/questions/46933824/matplotlib-adding-an-axes-using-the-same-arguments-as-a-previous-axes#
 #
 #    ax1 = subplot(..)
 #    plot(..)
@@ -25,8 +25,8 @@ import Measurements
 import MonteCarloMeasurements
 
 # Determine whether pmean, pmaximum, pminimum is available (MonteCarlMeasurements, version >= 1.0)
-const pfunctionsDefined = isdefined(MonteCarloMeasurements, :pmean) 
-        
+const pfunctionsDefined = isdefined(MonteCarloMeasurements, :pmean)
+
 using  Unitful
 
 import PyCall
@@ -35,12 +35,22 @@ import PyPlot
 export plot, showFigure, saveFigure, closeFigure, closeAllFigures
 
 
-set_matplotlib_rcParams!(args...) = 
+set_matplotlib_rcParams!(args...) =
    merge!(PyCall.PyDict(PyPlot.matplotlib."rcParams"), Dict(args...))
 
 
 include("$(SignalTables.path)/src/AbstractPlotInterface.jl")
 
+function setAxisLimits(x)
+    delta = x[end] - x[1]
+    extra = 0.02*delta
+    xmin  = x[1]-extra
+    xmax  = x[end]+extra
+    if !isnan(xmin) && !isnan(xmax)
+        #println("delta = $delta, xmin=$xmin, xmax=$xmax")
+        PyPlot.xlim(xmin,xmax)
+    end
+end
 
 function plotOneSignal(xsig, ysig, ysigType, label, MonteCarloAsArea)
     xsig2 = ustrip.(xsig)
@@ -59,6 +69,7 @@ function plotOneSignal(xsig, ysig, ysigType, label, MonteCarloAsArea)
 		ysig_max = ysig_mean + ysig_u
 		ysig_min = ysig_mean - ysig_u
 		PyPlot.fill_between(xsig_mean, ysig_min, ysig_max, color=rgba2)
+        setAxisLimits(xsig_mean)
 
     elseif typeof(ysig2[1]) <: MonteCarloMeasurements.StaticParticles ||
            typeof(ysig2[1]) <: MonteCarloMeasurements.Particles
@@ -70,7 +81,7 @@ function plotOneSignal(xsig, ysig, ysigType, label, MonteCarloAsArea)
         else
             # MonteCarloMeasurements, version < 1.0
             xsig_mean = MonteCarloMeasurements.mean.(xsig2)
-            ysig_mean = MonteCarloMeasurements.mean.(ysig2)            
+            ysig_mean = MonteCarloMeasurements.mean.(ysig2)
         end
         xsig_mean = ustrip.(xsig_mean)
         ysig_mean = ustrip.(ysig_mean)
@@ -82,17 +93,18 @@ function plotOneSignal(xsig, ysig, ysigType, label, MonteCarloAsArea)
             # Plot area of uncertainty around mean value signal (use the same color, but transparent)
     		rgba2 = (rgba[1], rgba[2], rgba[3], 0.2)
             if pfunctionsDefined
-                # MonteCarlMeasurements, version >= 1.0          
+                # MonteCarlMeasurements, version >= 1.0
                 ysig_max = MonteCarloMeasurements.pmaximum.(ysig2)
                 ysig_min = MonteCarloMeasurements.pminimum.(ysig2)
             else
                 # MonteCarloMeasurements, version < 1.0
                 ysig_max = MonteCarloMeasurements.maximum.(ysig2)
-                ysig_min = MonteCarloMeasurements.minimum.(ysig2)                
+                ysig_min = MonteCarloMeasurements.minimum.(ysig2)
             end
             ysig_max = ustrip.(ysig_max)
             ysig_min = ustrip.(ysig_min)
     		PyPlot.fill_between(xsig_mean, ysig_min, ysig_max, color=rgba2)
+            setAxisLimits(xsig_mean)
         else
             # Plot all particle signals (use the same color, but transparent)
     		rgba2 = (rgba[1], rgba[2], rgba[3], 0.1)
@@ -105,6 +117,7 @@ function plotOneSignal(xsig, ysig, ysigType, label, MonteCarloAsArea)
                 ysig3 = ustrip.(ysig3)
                 PyPlot.plot(xsig, ysig3, color=rgba2)
             end
+            setAxisLimits(xsig)
         end
 
 	else
@@ -113,11 +126,11 @@ function plotOneSignal(xsig, ysig, ysigType, label, MonteCarloAsArea)
         elseif typeof(xsig2[1]) <: MonteCarloMeasurements.StaticParticles ||
                typeof(xsig2[1]) <: MonteCarloMeasurements.Particles
             if pfunctionsDefined
-                # MonteCarlMeasurements, version >= 1.0  
+                # MonteCarlMeasurements, version >= 1.0
                 xsig2 = MonteCarloMeasurements.pmean.(xsig2)
             else
-                # MonteCarlMeasurements, version < 1.0  
-                xsig2 = MonteCarloMeasurements.mean.(xsig2)            
+                # MonteCarlMeasurements, version < 1.0
+                xsig2 = MonteCarloMeasurements.mean.(xsig2)
             end
             xsig2 = ustrip.(xsig2)
         end
@@ -126,6 +139,7 @@ function plotOneSignal(xsig, ysig, ysigType, label, MonteCarloAsArea)
         else # SignalTables.Clocked
             PyPlot.plot(xsig2, ysig2, ".", label=label)
         end
+        setAxisLimits(xsig2)
 	end
 end
 
@@ -137,7 +151,7 @@ end
 Add the time series of one name (if names is one symbol/string) or with
 several names (if names is a tuple of symbols/strings) to the current diagram
 """
-function addPlot(collectionOfNames::Tuple, sigTable, grid::Bool, xLabel::Bool, xAxis, prefix::AbstractString, reuse::Bool, maxLegend::Integer, 
+function addPlot(collectionOfNames::Tuple, sigTable, grid::Bool, xLabel::Bool, xAxis, prefix::AbstractString, reuse::Bool, maxLegend::Integer,
                  MonteCarloAsArea::Bool, figure::Int, i::Int, j::Int, nsubFigures::Int)
     xsigLegend = ""
     nLegend = 0
@@ -161,7 +175,7 @@ function addPlot(collectionOfNames::Tuple, sigTable, grid::Bool, xLabel::Bool, x
     if nLegend <= maxLegend
         PyPlot.legend()
     elseif nsubFigures == 1
-        @info "plot(..): No legend in figure $figure, since curve number (= $nLegend) > maxLegend (= $maxLegend)\nCan be fixed by plot(..., maxLegend=$nLegend)"  
+        @info "plot(..): No legend in figure $figure, since curve number (= $nLegend) > maxLegend (= $maxLegend)\nCan be fixed by plot(..., maxLegend=$nLegend)"
     else
         @info "plot(..): No legend in subfigure ($i,$j) of figure $figure, since curve number (= $nLegend) > maxLegend (= $maxLegend)\nCan be fixed by plot(..., maxLegend=$nLegend)"
     end
@@ -191,7 +205,7 @@ function plot(sigTable, names::AbstractMatrix; heading::AbstractString="", grid:
 
     PyPlot.pygui(true) # Use separate plot windows (no inline plots)
 
-                                     
+
     if isnothing(sigTable)
         @info "The call of SignalTables.plot(sigTable, ...) is ignored, since the first argument is nothing."
         return
@@ -209,7 +223,7 @@ function plot(sigTable, names::AbstractMatrix; heading::AbstractString="", grid:
     for i = 1:nrow
         xLabel = i == nrow
         for j = 1:ncol
-            # "reuse" gives a warning 
+            # "reuse" gives a warning
             # MatplotlibDeprecationWarning: Adding an axes using the same arguments as a previous axes currently reuses the earlier instance.  In a future version, a new instance will always be created and returned.  Meanwhile, this warning can be suppressed, and the future behavior ensured, by passing a unique label to each axes instance.
             # One can gid rid of it by the sequence
             #    ax1 = subplot(..)

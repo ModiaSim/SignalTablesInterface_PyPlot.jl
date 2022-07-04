@@ -3,7 +3,7 @@
 [SignalTablesInterface_PyPlot](https://github.com/ModiaSim/SignalTablesInterface_PyPlot.jl) 
 is an interface from [SignalTables](https://github.com/ModiaSim/SignalTables.jl) to 
 [PyPlot](https://github.com/JuliaPy/PyPlot.jl) (= a
-Julia interface to the [Matplotlib](http://matplotlib.org/)
+Julia interface to [Matplotlib](http://matplotlib.org/))
 in order to be able to perform convenient line plots in SignalTables via PyPlot.
 
 SignalTablesInterface_PyPlot is usually not directly used, but is activated via package
