@@ -1,4 +1,4 @@
-module Runtests
+module Runtests_PyPlot
 
 import SignalTables
 using  SignalTables.Test
