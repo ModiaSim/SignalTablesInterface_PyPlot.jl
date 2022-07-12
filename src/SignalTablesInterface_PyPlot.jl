@@ -139,7 +139,9 @@ function plotOneSignal(xsig, ysig, ysigType, label, MonteCarloAsArea)
         else # SignalTables.Clocked
             PyPlot.plot(xsig2, ysig2, ".", label=label)
         end
-        setAxisLimits(xsig2)
+        if length(xsig2) > 1
+            setAxisLimits(xsig2)
+        end
 	end
 end
 
