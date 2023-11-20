@@ -52,7 +52,7 @@ function setAxisLimits(x)
     end
 end
 
-function plotOneSignal(xsig, ysig, ysigType, label, MonteCarloAsArea)
+function plotOneSignal(xsig, ysig, ysigType, label, MonteCarloAsArea; kwargs...)
     xsig2 = ustrip.(xsig)
     ysig2 = ustrip.(ysig)
 	if typeof(ysig2[1]) <: Measurements.Measurement
@@ -135,7 +135,7 @@ function plotOneSignal(xsig, ysig, ysigType, label, MonteCarloAsArea)
             xsig2 = ustrip.(xsig2)
         end
         if ysigType == SignalTables.Continuous
-            PyPlot.plot(xsig2, ysig2, label=label)
+            PyPlot.plot(xsig2, ysig2, label=label; kwargs...)
         else # SignalTables.Clocked
             PyPlot.plot(xsig2, ysig2, ".", label=label)
         end
@@ -153,8 +153,7 @@ end
 Add the time series of one name (if names is one symbol/string) or with
 several names (if names is a tuple of symbols/strings) to the current diagram
 """
-function addPlot(collectionOfNames::Tuple, sigTable, grid::Bool, xLabel::Bool, xAxis, prefix::AbstractString, reuse::Bool, maxLegend::Integer,
-                 MonteCarloAsArea::Bool, figure::Int, i::Int, j::Int, nsubFigures::Int)
+function addPlot(collectionOfNames::Tuple, sigTable, grid::Bool, xLabel::Bool, xAxis, prefix::AbstractString, reuse::Bool, maxLegend::Integer, MonteCarloAsArea::Bool, figure::Int, i::Int, j::Int, nsubFigures::Int; kwargs...)
     xsigLegend = ""
     nLegend = 0
 
@@ -164,10 +163,10 @@ function addPlot(collectionOfNames::Tuple, sigTable, grid::Bool, xLabel::Bool, x
         if !isnothing(xsig)
             nLegend = nLegend + length(ysigLegend)
             if ndims(ysig) == 1
-				plotOneSignal(xsig, ysig, ysigType, prefix*ysigLegend[1], MonteCarloAsArea)
+				plotOneSignal(xsig, ysig, ysigType, prefix*ysigLegend[1], MonteCarloAsArea; kwargs...)
             else
                 for i = 1:size(ysig,2)
-					plotOneSignal(xsig, ysig[:,i], ysigType, prefix*ysigLegend[i], MonteCarloAsArea)
+					plotOneSignal(xsig, ysig[:,i], ysigType, prefix*ysigLegend[i], MonteCarloAsArea; kwargs...)
                 end
             end
         end
@@ -187,8 +186,8 @@ function addPlot(collectionOfNames::Tuple, sigTable, grid::Bool, xLabel::Bool, x
     end
 end
 
-addPlot(name::AbstractString, args...) = addPlot((name,)        , args...)
-addPlot(name::Symbol        , args...) = addPlot((string(name),), args...)
+addPlot(name::AbstractString, args...; kwargs...) = addPlot((name,)        , args...; kwargs...)
+addPlot(name::Symbol        , args...; kwargs...) = addPlot((string(name),), args...; kwargs...)
 
 
 
