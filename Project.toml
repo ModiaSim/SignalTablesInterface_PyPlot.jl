@@ -1,7 +1,7 @@
 name = "SignalTablesInterface_PyPlot"
 uuid = "a24218ac-d749-4e8e-be24-21e617b5c7ba"
 authors = ["Martin.Otter@dlr.de <Martin.Otter@dlr.de>"]
-version = "0.1.4"
+version = "0.1.5"
 
 [deps]
 Colors = "5ae59095-9a9b-59fe-a467-6f913c188581"
@@ -15,14 +15,14 @@ Unitful = "1986cc42-f94f-5a68-af5c-568840ba703d"
 
 [compat]
 Colors = "0.12, 0.11, 0.10"
-DataFrames = "1, 0.22, 0.21, 0.20, 0.19"
+DataFrames = "1"
 Measurements = "2"
-MonteCarloMeasurements = "1, 0.10"
+MonteCarloMeasurements = "1"
 PyCall = "1.96, 1.93, 1.92"
 PyPlot = "2.11, 2.10, 2.9"
-SignalTables = "0.4, 0.3"
+SignalTables = "0.4"
 Unitful = "1"
-julia = "1.7"
+julia = "1.10"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
